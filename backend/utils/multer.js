@@ -1,14 +1,22 @@
-const multer = require("multer");
-const multer = require("multer");
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const uploadDir = path.join(__dirname, '..', 'uploads', 'theaters');
+fs.mkdirSync(uploadDir, { recursive: true });
+
 const storage = multer.diskStorage({
-  destination: "productImage",
+  destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
-    cb(null, Date.now() + file.originalname);
-  },
+    const ext = path.extname(file.originalname);
+    const name = `${Date.now()}-${Math.round(Math.random()*1e9)}${ext}`;
+    cb(null, name);
+  }
 });
 
-const upload = multer({
-  storage: storage,
-});
+const fileFilter = (req, file, cb) => {
+  if (/image\/(jpeg|png|jpg|webp)/.test(file.mimetype)) cb(null, true);
+  else cb(new Error('Only image files are allowed'), false);
+};
 
-module.exports =upload
+module.exports = multer({ storage, fileFilter });

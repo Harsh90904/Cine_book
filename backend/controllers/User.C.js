@@ -2,129 +2,170 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/User.M");
 const sendMail = require("../utils/SendMail");
+
 const otps = new Map();
+const JWT_SECRET = process.env.JWT_SECRET || "private-key";
+
 const Signup = async (req, res) => {
-  let { email, password } = req.body;
   try {
-    let user = await User.findOne({ email: email });
-    if (user) {
-      return res.status(403).json({ msg: "user already registered" });
-    } else {
-      let hash = await bcrypt.hash(password, 10);
-      req.body.password = hash;
-      user = await User.create(req.body);
-      let data = {
-        email: user.email,
-        id: user.id,
-        role: user.role,
-        username: user.username,
-        isActive: user.isActive,
-      };
-      let token = await jwt.sign(data, "private-key");
-      console.log(token);
-      let otp = Math.round(Math.random() * 10000);
-      console.log(otp);
-
-      otps.set(email, otp);
-      console.log(otps);
-
-      let html = `<div> 
-         <h1>hello ${user.username}</h1>
-         <a href=http://localhost:8090/user/verify/${token}/${otp}> verify</a>
-      </div>`;
-      console.log(
-        `<a href=http://localhost:8090/user/verify/${token}/${otp}> verify</a>`
-      );
-
-      try {
-        await sendMail(email, "verify", html);
-      } catch (error) {
-        return res.status(400).json({ message: error.message });
-      }
-      return res.status(201).json({
-        msg: "user created",
-        token: token,
-        isVerified: user.isVerified,
-      });
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ msg: "email and password are required" });
     }
+
+    const existing = await User.findOne({ where: { email } });
+    if (existing) {
+      return res.status(403).json({ msg: "user already registered" });
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+    // use 'password' field (match model)
+    const userPayload = { ...req.body, password: hash };
+
+    const user = await User.create(userPayload);
+
+    const data = {
+      email: user.email,
+      id: user.id,
+      role: user.role,
+      name: user.name,
+    };
+
+    const token = jwt.sign(data, JWT_SECRET, { expiresIn: "7d" });
+
+    const otp = Math.floor(1000 + Math.random() * 9000); // 4-digit OTP
+    otps.set(email, otp);
+
+    const html = `<div>
+      <h1>Hello ${user.name || user.email}</h1>
+    </div>`;
+
+    try {
+      await sendMail(email, "verify", html);
+    } catch (err) {
+      return res.status(400).json({ message: err.message });
+    }
+
+    return res.status(201).json({
+      msg: "user created",
+      token
+    });
   } catch (error) {
-    res.status(500).json({ msg: "err", error: error.message });
+    return res.status(500).json({ msg: "err", error: error.message });
   }
 };
 
 const Login = async (req, res) => {
-  let { email, password } = req.body;
-  let user = await User.findOne({ email });
-  if (!user) {
-    return res.status(404).json({ msg: "user not found" });
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ msg: "email and password required" });
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(404).json({ msg: "user not found" });
+
+    // compare with 'password' field
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ msg: "invalid password" });
+
+    const data = {
+      email: user.email,
+      id: user.id,
+      role: user.role,
+      name: user.name,
+      isActive: user.isActive,
+    };
+
+    const token = jwt.sign(data, JWT_SECRET, { expiresIn: "7d" });
+
+    return res.status(200).json({
+      msg: "user loggedIn",
+      token,
+      isVerified: user.isVerified ?? false,
+      isActive: user.isActive,
+    });
+  } catch (error) {
+    return res.status(500).json({ msg: "err", error: error.message });
   }
-  let isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    return res.status(404).json({ msg: "invalid password " });
-  }
-  let data = {
-    email: user.email,
-    id: user.id,
-    role: user.role,
-    username: user.username,
-    isActive: user.isActive,
-  };
-  let token = await jwt.sign(data, "private-key");
-  return res
-    .status(200)
-    .json({ msg: "user loggedIn", token: token, isVerified: user.isVerified,isActive: user.isActive });
 };
 
 const GetUserByid = async (req, res) => {
   try {
-    let { userid } = req.params;
-    let data = await User.findById(userid);
-    res.send(data);
+    const { userid } = req.params;
+    const user = await User.findByPk(userid, { attributes: { exclude: ["passw"] } });
+    if (!user) return res.status(404).json({ msg: "user not found" });
+    return res.json(user);
   } catch (error) {
-    res.send({ message: error });
+    return res.status(500).json({ message: error.message });
   }
 };
 
 const deleteUser = async (req, res) => {
-  let { id } = req.params;
   try {
-    let user = await User.findByIdAndDelete(id);
-    res.status(200).json({ msg: "user deleted", user });
+    const { id } = req.params;
+    const deleted = await User.destroy({ where: { id } });
+    if (!deleted) return res.status(404).json({ msg: "user not found" });
+    return res.status(200).json({ msg: "user deleted" });
   } catch (error) {
-    console.log(error.message);
-    res.status(404).json({ msg: "error deleting user", error });
+    return res.status(500).json({ msg: "error deleting user", error: error.message });
   }
 };
 
 const getAdmins = async (req, res) => {
-try {
-    let data = await User.find({ role: "ADMIN" });
-    res.status(202).json(data);
-    console.log(data);
-    
-} catch (error) {
-  res.status(404).json({ err:error.message });
-}
+  try {
+    const admins = await User.findAll({
+      where: { role: "ADMIN" },
+      attributes: { exclude: ["passw"] },
+    });
+    return res.status(200).json(admins);
+  } catch (error) {
+    return res.status(500).json({ err: error.message });
+  }
 };
+
+// Toggle isActive for a user (admin route)
 const toggleUserActiveStatus = async (req, res) => {
-  let { token, otp } = req.params;
-  let decode = await jwt.verify(token, "private-key");
-  
-  if (!decode) {
-    return res.status(403).json({ msg: "err" });
-  }
-  let oldOtp = otps.get(decode.email);
+  try {
+    const { id } = req.params;
+    const user = await User.findByPk(id);
+    if (!user) return res.status(404).json({ msg: "user not found" });
 
-  if (oldOtp == otp) {
-    let data = await User.findByIdAndUpdate(
-      decode.id,
-      { isVerified: true },
-      { new: true }
-    );
-    res.status(200).json({ msg: "verified", data });
-  } else {
-    res.status(404).json({ err: "invalid otp" });
+    user.isActive = !user.isActive;
+    await user.save();
+
+    return res.status(200).json({ msg: "status updated", id: user.id, isActive: user.isActive });
+  } catch (error) {
+    return res.status(500).json({ err: error.message });
   }
 };
 
-module.exports = { Signup, Login, GetUserByid, deleteUser , getAdmins , toggleUserActiveStatus};
+// OPTIONAL: endpoint for verifying token+otp from signup link
+const verifyWithTokenOtp = async (req, res) => {
+  try {
+    const { token, otp } = req.params;
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (!decoded) return res.status(403).json({ msg: "invalid token" });
+
+    const oldOtp = otps.get(decoded.email);
+    if (String(oldOtp) !== String(otp)) return res.status(400).json({ msg: "invalid otp" });
+
+    const user = await User.findByPk(decoded.id);
+    if (!user) return res.status(404).json({ msg: "user not found" });
+
+    await user.update({ isVerified: true });
+    otps.delete(decoded.email);
+
+    return res.status(200).json({ msg: "verified", data: { id: user.id, isVerified: true } });
+  } catch (error) {
+    return res.status(500).json({ err: error.message });
+  }
+};
+
+module.exports = {
+  Signup,
+  Login,
+  GetUserByid,
+  deleteUser,
+  getAdmins,
+  toggleUserActiveStatus,
+  verifyWithTokenOtp,
+};

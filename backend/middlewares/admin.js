@@ -3,7 +3,7 @@ const isAdmin = (req, res, next) => {};
 const isSuperAdmin = (req, res, next) => {
   try {
     if (req.user) {
-      if (req.user?.role == "CEO") {
+      if (req.user?.role == "SUPERADMIN") {
         return next();
       } else {
         return res

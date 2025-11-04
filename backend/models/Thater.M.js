@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../../config/DB');
+const sequelize = require('../config/DB');
 
 const Theater = sequelize.define('Theater', {
   id: {
@@ -24,6 +24,7 @@ const Theater = sequelize.define('Theater', {
     type: DataTypes.INTEGER,
     defaultValue: 1
   },
+  images: DataTypes.ARRAY(DataTypes.STRING),
   total_seats: {
     type: DataTypes.INTEGER,
     defaultValue: 0
