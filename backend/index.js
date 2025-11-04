@@ -4,6 +4,8 @@ const cors = require("cors");
 const userRouter = require("./routers/User.R");
 const movieRouter = require("./routers/Movie.R");
 const ThaterRouter = require("./routers/Thater.R");
+const BookingRouter = require("./routers/booking.R");
+const SeatRouter = require("./routers/seat.R");
 const path = require("path");
 require("dotenv").config();
 
@@ -15,6 +17,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/user", userRouter);
 app.use("/movie", movieRouter)
 app.use("/", ThaterRouter)
+app.use("/booking", BookingRouter);
+app.use("/seat", SeatRouter);
+
 const PORT = process.env.PORT || 3000;
 
 // Sync models (create/alter tables) then start server
