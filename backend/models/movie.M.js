@@ -17,8 +17,17 @@ const Movie = sequelize.define('Movie', {
   language: DataTypes.STRING,
   release_date: DataTypes.DATE,
   poster_url: DataTypes.STRING,
-  description: DataTypes.TEXT,
-  rating: DataTypes.FLOAT
+  Director: DataTypes.STRING,
+  Writer: DataTypes.STRING,
+  Actors: DataTypes.STRING,
+  Country: DataTypes.STRING,
+  Awards: DataTypes.STRING,
+  Plot: DataTypes.TEXT,
+  imdbRating: DataTypes.FLOAT,
+  imdbVotes: DataTypes.INTEGER,
+  imdbID:DataTypes.STRING,
+  Type: DataTypes.STRING,
+  BoxOffice_caletion: DataTypes.INTEGER
 }, {
   tableName: 'movies',
   timestamps: true,

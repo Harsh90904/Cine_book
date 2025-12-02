@@ -8,50 +8,44 @@ const JWT_SECRET = process.env.JWT_SECRET || "private-key";
 
 const Signup = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password, moblie_number } = req.body;
+
     if (!email || !password) {
-      return res.status(400).json({ msg: "email and password are required" });
+      return res.status(400).json({ message: "email and password are required" });
     }
 
+    // check existing user
     const existing = await User.findOne({ where: { email } });
     if (existing) {
-      return res.status(403).json({ msg: "user already registered" });
+      return res.status(409).json({ message: "Email already registered" });
     }
 
     const hash = await bcrypt.hash(password, 10);
-    // use 'password' field (match model)
-    const userPayload = { ...req.body, password: hash };
+    const user = await User.create({
+      name: name || null,
+      email,
+      password: hash,
+      moblie_number: moblie_number || null,
+    });
 
-    const user = await User.create(userPayload);
+    const safeUser = user.toJSON();
+    delete safeUser.password;
 
-    const data = {
-      email: user.email,
-      id: user.id,
-      role: user.role,
-      name: user.name,
-    };
+    return res.status(201).json({ message: "User created", user: safeUser });
+  } catch (err) {
+    // Detailed logging for debugging
+    console.error("Signup error:", err);
 
-    const token = jwt.sign(data, JWT_SECRET, { expiresIn: "7d" });
-
-    const otp = Math.floor(1000 + Math.random() * 9000); // 4-digit OTP
-    otps.set(email, otp);
-
-    const html = `<div>
-      <h1>Hello ${user.name || user.email}</h1>
-    </div>`;
-
-    try {
-      await sendMail(email, "verify", html);
-    } catch (err) {
-      return res.status(400).json({ message: err.message });
+    // Sequelize specific errors
+    if (err.name === "SequelizeUniqueConstraintError") {
+      return res.status(409).json({ message: "Duplicate value", details: err.errors });
+    }
+    if (err.name === "SequelizeValidationError") {
+      return res.status(400).json({ message: "Validation error", details: err.errors.map(e => e.message) });
     }
 
-    return res.status(201).json({
-      msg: "user created",
-      token
-    });
-  } catch (error) {
-    return res.status(500).json({ msg: "err", error: error.message });
+    // Fallback
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

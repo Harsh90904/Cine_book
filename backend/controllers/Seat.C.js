@@ -1,4 +1,5 @@
-const { Seat, Screen } = require('../models');
+const Seat  = require('../models/Seat.M');
+const Screen = require('../models/Screen.M')
 const sequelize = require('../config/DB');
 const Theater = require('../models/Thater.M');
 

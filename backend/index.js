@@ -20,10 +20,18 @@ app.use("/", ThaterRouter)
 app.use("/booking", BookingRouter);
 app.use("/seat", SeatRouter);
 
-const PORT = process.env.PORT || 3000;
+// global error handler
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  const status = err.status || 500;
+  res.status(status).json({
+    error: err.message || "Internal Server Error",
+  });
+});
 
-// Sync models (create/alter tables) then start server
-sequelize.sync({ alter: true }) // use { force: true } to drop+recreate
+const PORT = process.env.PORT || 8090;
+
+sequelize.sync({ alter: true })
   .then(() => {
     console.log("Database synced");
     return sequelize.authenticate();

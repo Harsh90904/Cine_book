@@ -1,4 +1,6 @@
-const { Show, Seat, ShowSeat } = require('../models');
+const Seat  = require('../models/Seat.M');
+const  Show  = require('../models/Show.M');
+const ShowSeat = require('../models/ShowSeat.M')
 const sequelize = require('../config/DB');
 
 exports.createShow = async (req, res) => {

@@ -1,3 +1,4 @@
+const { NUMBER } = require('sequelize');
 const Movie = require('../models/movie.M')
 const  Show  = require('../models/Show.M');
 const axios = require('axios')
@@ -23,8 +24,17 @@ const addMovie = async (req, res) => {
       language: data.Language,
       release_date: data.Released ? new Date(data.Released) : null,
       poster_url: data.Poster,
-      description: data.Plot,
-      rating: data.imdbRating ? parseFloat(data.imdbRating) : null,
+      Director: data.Director,
+      Writer: data.Writer,
+      Actors: data.Actors,
+      Country: data.Country,
+      Awards: data.Awards,
+      Plot: data.Plot,
+      imdbRating: data.imdbRating ? parseFloat(data.imdbRating) : null,
+      imdbVotes: data.imdbVotes ? parseInt(data.imdbVotes.replace(NUMBER)) : null,
+      imdbID: data.imdbID,
+      Type: data.Type,
+      BoxOffice: data.BoxOffice ? parseInt(data.BoxOffice.replace(NUMBER)) : null
     })
 
     res.status(201).json({ message: 'Movie added successfully', movie })
