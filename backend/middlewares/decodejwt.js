@@ -1,25 +1,26 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 
-const decode = (req, res, next) => {
-  console.log("Authorization Header:", req.headers.authorization);
-  const token = req.headers?.authorization?.split(" ")[1];
-console.log("wow", req.body);
+const decodeJWT = (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'No token provided' });
 
-  if (token) {
-    console.log(token);
-    
-    jwt.verify(token, "private-key", (error, decoded) => {
-      if (error) {
-        return res.status(401).json({ error: "Invalid or expired token" });
-      }
-      req.user = decoded;
-      console.log(decoded);
-      next();
-    });
-  } else {
-    res.status(401).json({ error: "Token not provided" });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid token', error: err.message });
   }
 };
-
-
-module.exports = { decode };
+const ThaterDecodeJWT = (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'No token provided' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    req.thater = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Invalid token', error: err.message });
+  }
+}
+module.exports = {decodeJWT, ThaterDecodeJWT}

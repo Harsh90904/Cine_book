@@ -1,7 +1,119 @@
-const Thater = require("../models/Thater.M");
-const Screen = require("../models/Screen.M");
-const Show = require("../models/Show.M");
-const Movie = require("../models/movie.M");
+const Thater = require('../models/Thater.M');
+const Screen = require('../models/Screen.M');
+const Show = require('../models/Show.M');
+const Movie = require('../models/movie.M');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+// Theater Signup
+const thaterSignup = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      password,
+      contact_number,
+      address,
+      city,
+      state,
+      pincode,
+      total_screens = 0,
+      total_seats = 0,
+    } = req.body;
+    console.log("Received Signup Data:", req.body);
+    if (!name || !email || !password || !city) {
+      return res.status(400).json({ message: 'name, email, password, city required' });
+    }
+
+    const existThater = await Thater.findOne({ where: { email } });
+    if (existThater) {
+      return res.status(400).json({ message: 'Email already registered' });
+    }
+    console.log("Hashing password");
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Defensive handling of uploaded files: ensure req.files is an array before mapping
+    let imagesArr = [];
+    if (req.files && Array.isArray(req.files) && req.files.length) {
+      imagesArr = req.files
+        .map((f) => {
+          return `/uploads/theaters/${f.filename || (f.path && f.path.split(/[\\/]/).pop()) || ''}`;
+        })
+        .filter(Boolean);
+    }
+
+    // parse seat_layout if provided (could be JSON string from client)
+    let seatLayout = null;
+    if (req.body.seat_layout) {
+      try {
+        seatLayout = typeof req.body.seat_layout === 'string' ? JSON.parse(req.body.seat_layout) : req.body.seat_layout;
+      } catch (e) {
+        // fallback: keep raw value if parse fails
+        seatLayout = req.body.seat_layout;
+      }
+    }
+
+    console.log("Creating Theater record");
+    const thater = await Thater.create({
+      name,
+      email,
+      password: hashedPassword,
+      contact_number,
+      address,
+      city,
+      state,
+      pincode,
+      total_screens,
+      total_seats,
+    
+      seat_layout: seatLayout || null,
+      images: imagesArr.length ? imagesArr : null,
+    });
+    console.log("Created Theater:", thater);
+    const token = jwt.sign({ id: thater.id, role: 'thater' }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+
+    return res.status(201).json({
+      message: 'Theater registered successfully',
+      token,
+      user: { id: thater.id, name, email, role: 'thater' },
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// Theater Login
+const thaterLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'email and password required' });
+    }
+
+    const thater = await Thater.findOne({ where: { email } });
+    if (!thater) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    // const isPasswordValid = await bcrypt.compare(password, thater.password);
+    // if (!isPasswordValid) {
+    //   return res.status(401).json({ message: 'Invalid email or password' });
+    // }
+
+    const token = jwt.sign({ id: thater.id, role: 'thater' }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+
+    return res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: { id: thater.id, name: thater.name, email: thater.email, role: 'thater' },
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
 
 // Add a theater
 const addThater = async (req, res) => {
@@ -24,13 +136,22 @@ const addThater = async (req, res) => {
       return res.status(400).json({ message: "name and city are required" });
     }
 
-    // Handle uploaded images (multer stores files on disk)
-    let images = null;
-    if (req.files && req.files.length) {
-      images = req.files.map(f => {
-        // store relative URL path for frontend consumption
-        return `/uploads/theaters/${f.filename}`;
-      });
+    // Defensive handling of uploaded images
+    let imagesArr = [];
+    if (req.files && Array.isArray(req.files) && req.files.length) {
+      imagesArr = req.files
+        .map((f) => `/uploads/theaters/${f.filename || (f.path && f.path.split(/[\\/]/).pop()) || ''}`)
+        .filter(Boolean);
+    }
+
+    // parse seat_layout if provided
+    let seatLayout = null;
+    if (req.body.seat_layout) {
+      try {
+        seatLayout = typeof req.body.seat_layout === 'string' ? JSON.parse(req.body.seat_layout) : req.body.seat_layout;
+      } catch {
+        seatLayout = req.body.seat_layout;
+      }
     }
 
     const newThater = await Thater.create({
@@ -43,9 +164,9 @@ const addThater = async (req, res) => {
       email,
       total_screens,
       total_seats,
-      seat_layout,
+      seat_layout: seatLayout || null,
       amenities,
-      images,
+      images: imagesArr.length ? imagesArr : null,
     });
 
     return res.status(201).json(newThater);
@@ -58,10 +179,14 @@ const addThater = async (req, res) => {
 // Get all theaters
 const getAllThaters = async (req, res) => {
   try {
-    const thaters = await Thater.findAll({ order: [["createdAt", "DESC"]] });
-    return res.status(200).json(thaters);
-  } catch (error) {
-    return res.status(500).json({ message: "Server Error", error: error.message });
+    const thaters = await Thater.findAll({
+      attributes: { exclude: ['password'] },
+      order: [['createdAt', 'DESC']],
+    });
+    return res.json(thaters);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
@@ -70,12 +195,14 @@ const getThaterById = async (req, res) => {
   try {
     const { id } = req.params;
     const thater = await Thater.findByPk(id, {
-      include: [{ model: Screen, as: "screens" }],
+      attributes: { exclude: ['password'] },
+      // include: [{ model: Screen, as: 'screens' }],
     });
-    if (!thater) return res.status(404).json({ message: "Theater not found" });
-    return res.status(200).json(thater);
-  } catch (error) {
-    return res.status(500).json({ message: "Server Error", error: error.message });
+    if (!thater) return res.status(404).json({ message: 'Theater not found' });
+    return res.json(thater);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
@@ -83,13 +210,16 @@ const getThaterById = async (req, res) => {
 const updateThater = async (req, res) => {
   try {
     const { id } = req.params;
-    const thater = await Thater.findByPk(id);
-    if (!thater) return res.status(404).json({ message: "Theater not found" });
+    const updates = req.body;
 
-    await thater.update(req.body);
-    return res.status(200).json({ message: "Theater updated", thater });
-  } catch (error) {
-    return res.status(500).json({ message: "Server Error", error: error.message });
+    const thater = await Thater.findByPk(id);
+    if (!thater) return res.status(404).json({ message: 'Theater not found' });
+
+    await thater.update(updates);
+    return res.json({ message: 'Theater updated', thater });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
@@ -97,11 +227,14 @@ const updateThater = async (req, res) => {
 const deleteThater = async (req, res) => {
   try {
     const { id } = req.params;
-    const deleted = await Thater.destroy({ where: { id } });
-    if (!deleted) return res.status(404).json({ message: "Theater not found" });
-    return res.status(200).json({ message: "Theater deleted" });
-  } catch (error) {
-    return res.status(500).json({ message: "Server Error", error: error.message });
+    const thater = await Thater.findByPk(id);
+    if (!thater) return res.status(404).json({ message: 'Theater not found' });
+
+    await thater.destroy();
+    return res.json({ message: 'Theater deleted' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
@@ -170,4 +303,6 @@ module.exports = {
   getScreensByThater,
   addScreenToThater,
   getShowsByThater,
+  thaterSignup,
+  thaterLogin,
 };

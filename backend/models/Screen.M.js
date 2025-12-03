@@ -19,7 +19,7 @@ const Screen = sequelize.define('Screen', {
     type: DataTypes.INTEGER,
     defaultValue: 0
   },
-  seat_map: DataTypes.JSONB,
+  seat_map: DataTypes.STRING,
   type: {
     type: DataTypes.ENUM('2D','3D','IMAX','4DX','OTHER'),
     defaultValue: '2D'

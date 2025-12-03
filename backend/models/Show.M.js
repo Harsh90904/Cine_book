@@ -27,7 +27,7 @@ const Show = sequelize.define('Show', {
     type: DataTypes.DATE,
     allowNull: false
   },
-  price_map: DataTypes.JSONB,
+  ticket_price: DataTypes.INTEGER,
   language: DataTypes.STRING,
   is_active: {
     type: DataTypes.BOOLEAN,

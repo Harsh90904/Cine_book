@@ -79,3 +79,15 @@ exports.createScreenWithSeats = async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 };
+exports.getShowSeats = async (req, res) => {
+  try {
+    const { show_id } = req.params;
+    if (!show_id) return res.status(400).json({ error: 'show_id is required' });
+
+    const seats = await ShowSeat.findAll({ where: { show_id } });
+    return res.json(seats);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: err.message });
+  }
+};

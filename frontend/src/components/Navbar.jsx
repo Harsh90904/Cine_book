@@ -30,6 +30,19 @@ const Navbar = () => {
           <li>
             <Link to="/bookings">Bookings</Link>
           </li>
+          <li>
+            <Link to="/SeatSelection">SeatSelection</Link>
+          </li>
+          {!user && (
+            <>
+              <li>
+                <Link to="/thater_login">Thater Login</Link>
+              </li>
+              <li>
+                <Link to="/thater_signup">Thater Signup</Link>
+              </li>
+            </>
+          )}
           {Ability(["admin"]) ? (
             <li className="nav-item">
               <Link className="nav-link" to="/assign">
@@ -61,16 +74,16 @@ const Navbar = () => {
       </div>
       <div className="navbar-end">
         <form className="d-flex" role="search">
-            <input
-              className="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button className="btn btn-outline-success" type="submit">
-              Search
-            </button>
-          </form>
+          <input
+            className="form-control me-2"
+            type="search"
+            placeholder="Search"
+            aria-label="Search"
+          />
+          <button className="btn btn-outline-success" type="submit">
+            Search
+          </button>
+        </form>
       </div>
     </nav>
   );

@@ -35,12 +35,17 @@ exports.bookSeats = async (req, res) => {
       return res.status(400).json({ message: 'Some seats already booked' });
     }
 
-    await Promise.all(
-      seats.map(s => s.update({ status: 'reserved' }, { transaction: t })) // reserve until payment
-    );
+//     await Promise.all(
+//   seats.map(s =>
+//     s.update(
+//       { status: 'reserved', booking_id: booking.id },
+//       { transaction: t }
+//     )
+//   )
+// );
 
-    // Create booking with pending status; frontend will call create-order next
-    const totalAmount = seat_ids.length * 200; // change pricing logic as needed
+  
+    const totalAmount = seat_ids.length * 200; 
     const booking = await Booking.create(
       {
         user_id,
@@ -76,7 +81,7 @@ exports.createRazorpayOrder = async (req, res) => {
       amount: amountPaise,
       currency: 'INR',
       receipt: `rcpt_${booking.id}`,
-      payment_capture: 1, // auto-capture
+      payment_capture: 1, 
     });
 
     return res.status(200).json({
@@ -115,14 +120,11 @@ exports.verifyRazorpayPayment = async (req, res) => {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
-    // mark booking confirmed and store payment id (add field payment_id in model if desired)
     await booking.update({ status: 'confirmed', payment_method: 'razorpay' }, { transaction: t });
 
-    // mark show seats as booked permanently (you may need to load seat ids associated with this booking)
-    // For now assume frontend provided seat_ids to bookSeats earlier; ensure ShowSeat rows moved from 'reserved' to 'booked'
     await ShowSeat.update(
       { status: 'booked' },
-      { where: { booking_id: booking.id }, transaction: t } // requires ShowSeat.booking_id column OR update by other criteria
+      { where: { booking_id: booking.id }, transaction: t } 
     ).catch(() => null);
 
     await t.commit();

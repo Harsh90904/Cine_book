@@ -5,6 +5,37 @@ const axios = require('axios')
 
 const OMDB_API_KEY = process.env.OMDB_API_KEY
 
+// Get all movies
+const getAllMovies = async (req, res) => {
+  try {
+    const movies = await Movie.findAll({
+      order: [['createdAt', 'DESC']],
+    });
+    res.status(200).json(movies);
+  } catch (error) {
+    console.error("Get Movies Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get single movie
+const getMovieById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const movie = await Movie.findByPk(id);
+    if (!movie) {
+      return res.status(404).json({ message: "Movie not found" });
+    }
+
+    res.status(200).json(movie);
+  } catch (error) {
+    console.error("Get Movie Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Add movie (admin only)
 const addMovie = async (req, res) => {
   try {
     const { title } = req.body
@@ -44,48 +75,56 @@ const addMovie = async (req, res) => {
   }
 }
 
-const getAllMovies = async (req, res) => {
-  try {
-    const movies = await Movie.findAll({ order: [['created_at', 'DESC']] })
-    res.json(movies)
-  } catch (err) {
-    res.status(500).json({ message: 'Server Error' })
-  }
-}
-
-
-const getMovieById = async (req, res) => {
-  try {
-    const movie = await Movie.findByPk(req.params.id)
-    if (!movie) return res.status(404).json({ message: 'Movie not found' })
-    res.json(movie)
-  } catch (err) {
-    res.status(500).json({ message: 'Server Error' })
-  }
-}
-
+// Update movie
 const updateMovie = async (req, res) => {
   try {
-    const movie = await Movie.findByPk(req.params.id)
-    if (!movie) return res.status(404).json({ message: 'Movie not found' })
-    await movie.update(req.body)
-    res.json({ message: 'Movie updated successfully', movie })
-  } catch (err) {
-    res.status(500).json({ message: 'Server Error' })
-  }
-}
+    const { id } = req.params;
+    const { title, description, genre, duration, release_date, rating, poster_url } = req.body;
 
+    const movie = await Movie.findByPk(id);
+    if (!movie) {
+      return res.status(404).json({ message: "Movie not found" });
+    }
+
+    await movie.update({
+      title: title || movie.title,
+      description: description || movie.description,
+      genre: genre || movie.genre,
+      duration: duration || movie.duration,
+      release_date: release_date || movie.release_date,
+      rating: rating || movie.rating,
+      poster_url: poster_url || movie.poster_url,
+    });
+
+    res.status(200).json({
+      message: "Movie updated successfully",
+      movie,
+    });
+  } catch (error) {
+    console.error("Update Movie Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete movie
 const deleteMovie = async (req, res) => {
   try {
-    const movie = await Movie.findByPk(req.params.id)
-    if (!movie) return res.status(404).json({ message: 'Movie not found' })
-    await movie.destroy()
-    res.json({ message: 'Movie deleted successfully' })
-  } catch (err) {
-    res.status(500).json({ message: 'Server Error' })
-  }
-}
+    const { id } = req.params;
 
+    const movie = await Movie.findByPk(id);
+    if (!movie) {
+      return res.status(404).json({ message: "Movie not found" });
+    }
+
+    await movie.destroy();
+    res.status(200).json({ message: "Movie deleted successfully" });
+  } catch (error) {
+    console.error("Delete Movie Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get shows by movie
 const getShowsByMovie = async (req, res) => {
   try {
     const movie = await Movie.findByPk(req.params.id, {
@@ -97,6 +136,7 @@ const getShowsByMovie = async (req, res) => {
     res.status(500).json({ message: 'Server Error' })
   }
 }
+
 module.exports = {
     addMovie,
     getAllMovies,

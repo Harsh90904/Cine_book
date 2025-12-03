@@ -1,61 +1,63 @@
-import  { useState } from "react";
-import  API  from "../config/api";
-import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import API from '../config/api';
 
-const User_login = () => {
+const Login = () => {
   const nav = useNavigate();
-  const [user, setUser] = useState({
-    email: "",
-    password: "",
-  });
-  const handleInput = (e) => {
-    let { name, value } = e.target;
-    setUser({ ...user, [name]: value });
-  };
-  const createUser = async (e) => {
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) =>
+    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+
+  const onSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
     try {
-      const response = await API.post("/user/login", user);
-      const { userId, token } = response.data;
-      console.log(response.data);
-      Cookies.set("userId", userId);
-      Cookies.set("token", token);
-      nav("/");
-    } catch (error) {
-      console.error("Error during user login:", error);
+      const res = await API.post('/user/login', form);
+      localStorage.setItem('user_token', res.data.token);
+      localStorage.setItem('user', JSON.stringify(res.data.user));
+      nav('/');
+    } catch (err) {
+      const msg = err?.response?.data?.message || err.message;
+      setError(String(msg));
+    } finally {
+      setLoading(false);
     }
   };
-  const onsubmit = (e) => {
-    e.preventDefault();
-    console.log(user);
-    createUser(e);
-  };
+
   return (
-    <div>
-      <form onSubmit={onsubmit}>
+    <div className="auth-container">
+      <form onSubmit={onSubmit} className="auth-form">
         <h2>User Login</h2>
-        <label htmlFor="email">Email:</label>
         <input
           type="email"
-          id="email"
           name="email"
-          value={user.email}
-          onChange={handleInput}
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
           required
         />
-        <label htmlFor="password">Password:</label>
         <input
           type="password"
-          id="password"
           name="password"
-          value={user.password}
-          onChange={handleInput}
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
           required
         />
-        <button type="submit" value={"Login"}>Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+        {error && <div className="error-msg">{error}</div>}
+        <p>
+          Don't have an account? <a href="/user-signup">Sign up</a>
+        </p>
       </form>
     </div>
   );
 };
-export default User_login;
+
+export default Login;

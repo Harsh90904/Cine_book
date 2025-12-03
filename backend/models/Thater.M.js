@@ -31,10 +31,11 @@ const Theater = sequelize.define('Theater', {
   },
   seat_layout: DataTypes.JSONB,
   amenities: DataTypes.JSONB,
+  password: DataTypes.STRING,
   is_active: {
     type: DataTypes.BOOLEAN,
     defaultValue: true
-  }
+  },
 }, {
   tableName: 'theaters',
   timestamps: true,

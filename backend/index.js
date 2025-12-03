@@ -6,8 +6,12 @@ const movieRouter = require("./routers/Movie.R");
 const ThaterRouter = require("./routers/Thater.R");
 const BookingRouter = require("./routers/booking.R");
 const SeatRouter = require("./routers/seat.R");
+const ScreenRouter = require("./routers/screen.R");
+const ShowRouter = require("./routers/Show.R");
+const assignAssociations = require("./models");
 const path = require("path");
 require("dotenv").config();
+//assignAssociations();
 
 const app = express();
 app.use(cors());
@@ -16,9 +20,11 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use("/user", userRouter);
 app.use("/movie", movieRouter)
-app.use("/", ThaterRouter)
+app.use("/thater", ThaterRouter)
 app.use("/booking", BookingRouter);
 app.use("/seat", SeatRouter);
+app.use("/screen", ScreenRouter);
+app.use("/show", ShowRouter);
 
 // global error handler
 app.use((err, req, res, next) => {

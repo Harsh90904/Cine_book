@@ -1,16 +1,15 @@
-module.exports = (sequelize, DataTypes) => {
-  const ShowSeat = sequelize.define('ShowSeat', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    status: { 
-      type: DataTypes.ENUM('available', 'booked', 'blocked'),
-      defaultValue: 'available'
-    }
-  });
+// backend/models/ShowSeat.M.js
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/DB');
 
-  ShowSeat.associate = models => {
-    ShowSeat.belongsTo(models.Show, { foreignKey: 'show_id', onDelete: 'CASCADE' });
-    ShowSeat.belongsTo(models.Seat, { foreignKey: 'seat_id', onDelete: 'CASCADE' });
-  };
+const ShowSeat = sequelize.define('ShowSeat', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  show_id: { type: DataTypes.INTEGER, allowNull: false },
+  seat_number: { type: DataTypes.INTEGER, allowNull: false },
+  is_available: { type: DataTypes.BOOLEAN, defaultValue: true },
+}, {
+  tableName: 'show_seats',
+  timestamps: false,
+});
 
-  return ShowSeat;
-};
+module.exports = ShowSeat;

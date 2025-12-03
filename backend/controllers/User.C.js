@@ -2,13 +2,14 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/User.M");
 const sendMail = require("../utils/SendMail");
+const { token } = require("morgan");
 
 const otps = new Map();
 const JWT_SECRET = process.env.JWT_SECRET || "private-key";
 
 const Signup = async (req, res) => {
   try {
-    const { name, email, password, moblie_number } = req.body;
+    const { name, email, password, moblie_number,age } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: "email and password are required" });
@@ -24,14 +25,15 @@ const Signup = async (req, res) => {
     const user = await User.create({
       name: name || null,
       email,
+      age,
       password: hash,
       moblie_number: moblie_number || null,
     });
 
     const safeUser = user.toJSON();
     delete safeUser.password;
-
-    return res.status(201).json({ message: "User created", user: safeUser });
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET);
+    return res.status(201).json({ message: "User created", user: safeUser,token });
   } catch (err) {
     // Detailed logging for debugging
     console.error("Signup error:", err);
@@ -65,6 +67,7 @@ const Login = async (req, res) => {
       email: user.email,
       id: user.id,
       role: user.role,
+      age,
       name: user.name,
       isActive: user.isActive,
     };
