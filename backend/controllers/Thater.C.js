@@ -5,7 +5,7 @@ const Movie = require('../models/movie.M');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Theater Signup
+// Thater Signup
 const thaterSignup = async (req, res) => {
   try {
     const {
@@ -37,7 +37,7 @@ const thaterSignup = async (req, res) => {
     if (req.files && Array.isArray(req.files) && req.files.length) {
       imagesArr = req.files
         .map((f) => {
-          return `/uploads/theaters/${f.filename || (f.path && f.path.split(/[\\/]/).pop()) || ''}`;
+          return `/uploads/thater/${f.filename || (f.path && f.path.split(/[\\/]/).pop()) || ''}`;
         })
         .filter(Boolean);
     }
@@ -83,7 +83,7 @@ const thaterSignup = async (req, res) => {
   }
 };
 
-// Theater Login
+// Thater Login
 const thaterLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -140,7 +140,7 @@ const addThater = async (req, res) => {
     let imagesArr = [];
     if (req.files && Array.isArray(req.files) && req.files.length) {
       imagesArr = req.files
-        .map((f) => `/uploads/theaters/${f.filename || (f.path && f.path.split(/[\\/]/).pop()) || ''}`)
+        .map((f) => `/uploads/thater/${f.filename || (f.path && f.path.split(/[\\/]/).pop()) || ''}`)
         .filter(Boolean);
     }
 
@@ -176,7 +176,7 @@ const addThater = async (req, res) => {
   }
 };
 
-// Get all theaters
+// Get all thater
 const getAllThaters = async (req, res) => {
   try {
     const thaters = await Thater.findAll({
@@ -242,7 +242,7 @@ const deleteThater = async (req, res) => {
 const getScreensByThater = async (req, res) => {
   try {
     const { id } = req.params;
-    const screens = await Screen.findAll({ where: { theater_id: id } });
+    const screens = await Screen.findAll({ where: { thater_id: id } });
     return res.status(200).json(screens);
   } catch (error) {
     return res.status(500).json({ message: "Server Error", error: error.message });
@@ -260,7 +260,7 @@ const addScreenToThater = async (req, res) => {
     if (!name) return res.status(400).json({ message: "screen name is required" });
 
     const screen = await Screen.create({
-      theater_id: id,
+      thater_id: id,
       name,
       seat_count,
       seat_map,
@@ -284,7 +284,7 @@ const getShowsByThater = async (req, res) => {
   try {
     const { id } = req.params;
     const shows = await Show.findAll({
-      where: { theater_id: id },
+      where: { thater_id: id },
       include: [{ model: Movie, as: "movie" }],
       order: [["start_time", "ASC"]],
     });

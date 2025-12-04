@@ -6,7 +6,7 @@ import "../styles/thater-dashboard.css";
 const ThaterDashboard = () => {
   const nav = useNavigate();
   const [user, setUser] = useState(null);
-  const [theater, setTheater] = useState(null);
+  const [thater, setthater] = useState(null);
   const [screens, setScreens] = useState([]);
   const [shows, setShows] = useState([]);
   const [movies, setMovies] = useState([]);
@@ -48,25 +48,25 @@ const ThaterDashboard = () => {
 
     const parsedUser = JSON.parse(userData);
     setUser(parsedUser);
-    fetchTheaterData(parsedUser.id);
+    fetchthaterData(parsedUser.id);
     fetchMovies();
   }, [nav]);
 
-  const fetchTheaterData = async (theaterId) => {
+  const fetchthaterData = async (thaterId) => {
     try {
       setLoading(true);
-      const [theaterRes, screensRes, showsRes] = await Promise.all([
-        API.get(`/thater/${theaterId}`),
-        API.get(`/screen/thater/${theaterId}`),
-         API.get(`/show/thater/${theaterId}`),
+      const [thaterRes, screensRes, showsRes] = await Promise.all([
+        API.get(`/thater/${thaterId}`),
+        API.get(`/screen/thater/${thaterId}`),
+         API.get(`/show/thater/${thaterId}`),
       ]);
 
-      setTheater(theaterRes.data);
+      setthater(thaterRes.data);
       setScreens(Array.isArray(screensRes.data) ? screensRes.data : []);
       setShows(Array.isArray(showsRes.data) ? showsRes.data : []);
       setError("");
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to load theater data");
+      setError(err?.response?.data?.message || "Failed to load thater data");
     } finally {
       setLoading(false);
     }
@@ -106,7 +106,7 @@ const ThaterDashboard = () => {
       }
 
       resetScreenForm();
-      setTimeout(() => fetchTheaterData(user.id), 500);
+      setTimeout(() => fetchthaterData(user.id), 500);
     } catch (err) {
       alert(err?.response?.data?.message || "Failed to save screen");
     }
@@ -132,7 +132,7 @@ const ThaterDashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSuccessMsg("Screen deleted successfully!");
-      fetchTheaterData(user.id);
+      fetchthaterData(user.id);
     } catch (err) {
       alert(err?.response?.data?.message || "Failed to delete screen");
     }
@@ -161,7 +161,7 @@ const ThaterDashboard = () => {
       const token = localStorage.getItem("thater_token");
       const payload = {
         ...showForm,
-        theater_id: user.id,
+        thater_id: user.id,
       };
 
       if (editingShow) {
@@ -177,7 +177,7 @@ const ThaterDashboard = () => {
       }
 
       resetShowForm();
-      setTimeout(() => fetchTheaterData(user.id), 500);
+      setTimeout(() => fetchthaterData(user.id), 500);
     } catch (err) {
       alert(err?.response?.data?.message || "Failed to save show");
     }
@@ -205,7 +205,7 @@ const ThaterDashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSuccessMsg("Show deleted successfully!");
-      fetchTheaterData(user.id);
+      fetchthaterData(user.id);
     } catch (err) {
       alert(err?.response?.data?.message || "Failed to delete show");
     }
@@ -247,8 +247,8 @@ const ThaterDashboard = () => {
       {/* Header */}
       <header className="dashboard-header">
         <div className="header-left">
-          <h1>🎬 Theater Dashboard</h1>
-          <p>{theater?.name}</p>
+          <h1>🎬 thater Dashboard</h1>
+          <p>{thater?.name}</p>
         </div>
         <div className="header-right">
           <span className="user-info">{user?.name}</span>
@@ -295,24 +295,24 @@ const ThaterDashboard = () => {
         {/* Overview Tab */}
         {activeTab === "overview" && (
           <section className="overview-section">
-            <h2>Theater Information</h2>
+            <h2>thater Information</h2>
             <div className="info-grid">
               <div className="info-card">
-                <h3>Theater Name</h3>
-                <p>{theater?.name}</p>
+                <h3>thater Name</h3>
+                <p>{thater?.name}</p>
               </div>
               <div className="info-card">
                 <h3>Email</h3>
-                <p>{theater?.email}</p>
+                <p>{thater?.email}</p>
               </div>
               <div className="info-card">
                 <h3>Contact Number</h3>
-                <p>{theater?.contact_number || "N/A"}</p>
+                <p>{thater?.contact_number || "N/A"}</p>
               </div>
               <div className="info-card">
                 <h3>Location</h3>
                 <p>
-                  {theater?.city}, {theater?.state} - {theater?.pincode}
+                  {thater?.city}, {thater?.state} - {thater?.pincode}
                 </p>
               </div>
               <div className="info-card">
@@ -325,16 +325,16 @@ const ThaterDashboard = () => {
               </div>
             </div>
 
-            {theater?.images && theater.images.length > 0 && (
+            {thater?.images && thater.images.length > 0 && (
               <div className="images-section">
-                <h3>Theater Images</h3>
+                <h3>thater Images</h3>
                 <div className="images-grid">
-                  {theater.images.map((img, idx) => (
+                  {thater.images.map((img, idx) => (
                     <img
                       key={idx}
                       src={img}
-                      alt={`Theater ${idx + 1}`}
-                      className="theater-image"
+                      alt={`thater ${idx + 1}`}
+                      className="thater-image"
                     />
                   ))}
                 </div>

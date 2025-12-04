@@ -4,25 +4,25 @@ const Theater = require('../models/Thater.M');
 // Add screen to theater
 const addScreen = async (req, res) => {
   try {
-    const { theater_id, name, seat_count, type, is_active } = req.body;
+    const { thater_id, name, seat_count, type, is_active } = req.body;
     const { id } = req.params;
 
-    const theaterId = theater_id || id;
+    const thaterId = thater_id || id;
 
-    if (!theaterId || !name || !seat_count) {
+    if (!thaterId || !name || !seat_count) {
       return res.status(400).json({ 
         message: "Theater ID, screen name, and seat count are required" 
       });
     }
 
     // Verify theater exists
-    const theater = await Theater.findByPk(theaterId);
-    if (!theater) {
+    const theater = await Theater.findByPk(thaterId);
+    if (!thaterId) {
       return res.status(404).json({ message: "Theater not found" });
     }
 
     const screen = await Screen.create({
-      theater_id: theaterId,
+      thater_id: thaterId,
       name,
       seat_count: parseInt(seat_count),
       type: type || '2D',
@@ -45,7 +45,7 @@ const getScreensByTheaterId = async (req, res) => {
     const { id } = req.params;
 
     const screens = await Screen.findAll({
-      where: { theater_id: id },
+      where: { thater_id: id },
       order: [['created_at', 'ASC']],
     });
 

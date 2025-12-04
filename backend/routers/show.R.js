@@ -7,11 +7,14 @@ const {
   updateShow,
   deleteShow,
   getShowSeats,
+  getShowsByMovie
 } = require('../controllers/Show.C');
 const ThaterDecodeJWT = require('../middlewares/decodejwt');
+const Show = require('../models/Show.M');
 
 ShowRouter.post('/', addShow);
 ShowRouter.get('/thater/:id', getShowsByTheater);
+ShowRouter.get('/movie/:movieId', getShowsByMovie);
 ShowRouter.get('/:id', getShowById);
 ShowRouter.patch('/:id',  updateShow);
 ShowRouter.delete('/:id', deleteShow);

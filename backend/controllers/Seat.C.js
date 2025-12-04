@@ -16,11 +16,11 @@ function rowLabel(n) {
 exports.createScreenWithSeats = async (req, res) => {
   const t = await sequelize.transaction();
   try {
-    const { name, theater_id, rows = 10, cols = 12 } = req.body;
+    const { name, thater_id, rows = 10, cols = 12 } = req.body;
 
-    if (!name || !theater_id) {
+    if (!name || !thater_id) {
       await t.rollback();
-      return res.status(400).json({ error: 'name and theater_id are required' });
+      return res.status(400).json({ error: 'name and thater_id are required' });
     }
 
     // validate numeric rows/cols
@@ -32,14 +32,14 @@ exports.createScreenWithSeats = async (req, res) => {
     }
 
     // ensure theater exists
-    const th = await Theater.findByPk(theater_id);
+    const th = await Theater.findByPk(thater_id);
     if (!th) {
       await t.rollback();
       return res.status(404).json({ error: 'Theater not found' });
     }
 
     // create screen
-    const screen = await Screen.create({ name, theater_id }, { transaction: t });
+    const screen = await Screen.create({ name, thater_id }, { transaction: t });
 
     // prepare seats
     const seatData = [];

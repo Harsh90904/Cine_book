@@ -37,7 +37,7 @@ const Theater = sequelize.define('Theater', {
     defaultValue: true
   },
 }, {
-  tableName: 'theaters',
+  tableName: 'thater',
   timestamps: true,
   underscored: true
 });

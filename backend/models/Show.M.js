@@ -7,7 +7,7 @@ const Show = sequelize.define('Show', {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true
   },
-  theater_id: {
+  thater_id: {
     type: DataTypes.UUID,
     allowNull: false
   },

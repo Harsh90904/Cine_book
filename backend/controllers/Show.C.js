@@ -9,7 +9,7 @@ const sequelize = require('../config/DB');
 
 //   const t = await sequelize.transaction();
 //   try {
-//     const { theater_id, screen_id, movie_id, start_time, end_time, ticket_price, status } = req.body;
+//     const { thater_id, screen_id, movie_id, start_time, end_time, ticket_price, status } = req.body;
 //     if (!screen_id || !movie_id || !start_time || ticket_price === undefined) {
 //       await t.rollback();
 //       return res.status(400).json({ message: "screen_id, movie_id, start_time and ticket_price are required" });
@@ -30,7 +30,7 @@ const sequelize = require('../config/DB');
 //     const show = await Show.create({
 //       screen_id,
 //       movie_id,
-//       theater_id: theater_id || screen.theater_id,
+//       thater_id: thater_id || screen.thater_id,
 //       start_time: new Date(start_time),
 //       end_time: end_time ? new Date(end_time) : null,
 //       ticket_price: parseInt(ticket_price, 10),
@@ -63,7 +63,7 @@ const sequelize = require('../config/DB');
 // };
 const addShow = async (req, res) => {
   try {
-    const { theater_id, screen_id, movie_id, start_time, end_time, ticket_price, status } = req.body;
+    const { thater_id, screen_id, movie_id, start_time, end_time, ticket_price, status } = req.body;
 
     if (!screen_id || !movie_id || !start_time || !ticket_price) {
       return res.status(400).json({ message: "screen_id, movie_id, start_time & ticket_price required" });
@@ -72,7 +72,7 @@ const addShow = async (req, res) => {
     const show = await Show.create({
       screen_id,
       movie_id,
-      theater_id,
+      thater_id,
       start_time,
       end_time: end_time || null,
       ticket_price,
@@ -97,7 +97,7 @@ const getShowsByTheater = async (req, res) => {
   try {
     const { id } = req.params;
     const shows = await Show.findAll({
-      where: { theater_id: id },
+      where: { thater_id: id },
       
       order: [['start_time', 'DESC']],
     });
@@ -198,7 +198,27 @@ const getShowSeats = async (req, res) => {
     return res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };
+const getShowsByMovie = async (req, res) => {
+  const Show = require('../models/Show.M');
+  const Screen = require('../models/Screen.M');
+  const Theater = require('../models/Thater.M');
 
+  try {
+    const { movieId } = req.params;
+    console.log("Fetching shows for movie:", movieId);
+
+    const shows = await Show.findAll({
+      // where: { movie_id: movieId, status: 'is_active' },
+      order: [['start_time', 'ASC']],
+    });
+    console.log("Shows fetched:", shows);
+    console.log("Found shows:", shows.length);
+    return res.status(200).json(shows);
+  } catch (error) {
+    console.error("Get Shows by Movie Error:", error);
+    return res.status(500).json({ message: error.message });
+  }
+};
 module.exports = {
   addShow,
   getShowsByTheater,
@@ -206,4 +226,5 @@ module.exports = {
   updateShow,
   deleteShow,
   getShowSeats,
+  getShowsByMovie
 };
