@@ -29,10 +29,11 @@ const Signup = async (req, res) => {
       password: hash,
       moblie_number: moblie_number || null,
     });
-
+    
     const safeUser = user.toJSON();
     delete safeUser.password;
     const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET);
+    console.log(token)
     return res.status(201).json({ message: "User created", user: safeUser,token });
   } catch (err) {
     // Detailed logging for debugging
@@ -67,7 +68,6 @@ const Login = async (req, res) => {
       email: user.email,
       id: user.id,
       role: user.role,
-      age,
       name: user.name,
       isActive: user.isActive,
     };

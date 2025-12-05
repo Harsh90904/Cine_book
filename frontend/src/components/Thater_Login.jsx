@@ -30,9 +30,9 @@ const Thater_Login = () => {
   };
 
   return (
-    <div className="auth-container">
-      <form onSubmit={onSubmit} className="auth-form">
-        <h2>Theater Login</h2>
+    <div className="hero flex justify-center items-center min-h-screen">
+      <form onSubmit={onSubmit} className="card p-7 shadow-lg w-full max-w-md shadow-[#303c58] text-center bg-white/10 border border-white/20 backdrop-blur-md flex items-center ">
+        <h2 className="text-4xl py-4">Theater Login</h2>
         <input
           type="email"
           name="email"
@@ -40,6 +40,7 @@ const Thater_Login = () => {
           value={form.email}
           onChange={handleChange}
           required
+          className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="password"
@@ -48,12 +49,13 @@ const Thater_Login = () => {
           value={form.password}
           onChange={handleChange}
           required
+          className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
-        <button type="submit" disabled={loading}>
+        <button className="bg-white/20 w-20 h-10 cursor-pointer rounded-xl hover:border border-white  " type="submit" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
         {error && <div className="error-msg">{error}</div>}
-        <p> Don't have an account? <a href="/thater-signup">Sign up</a>
+        <p className="pt-4"> Don`t have an account? <a className="  cursor-pointer rounded-xl hover:text-[#636363]  " href="/thater-signup">Sign up</a>
         </p>
       </form>
     </div>

@@ -1,10 +1,9 @@
-import React from "react";
+// import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
-// import MovieDetails from "./components/movie";
 // import Booking from "./components/Booking.jsx";
-import SeatSelection from "./components/SeatSelection";
+// import SeatSelection from "./components/SeatSelection";
 import MovieDetails from "./components/movieDetails";
 import Login from "./components/login";
 import Signup from "./components/signup";
@@ -21,7 +20,7 @@ export default function App() {
           <Route path="/movies" element={<Home />} />
           <Route path="/movie/:movieId" element={<MovieDetails />} />
           {/* <Route path="/booking/:showId" element={<Booking />} /> */}
-          <Route path="/show/:show_id" element={<SeatSelection />} />
+          {/* <Route path="/show/:show_id" element={<SeatSelection />} /> */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/thater_login" element={<Thater_Login />} />

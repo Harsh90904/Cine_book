@@ -29,9 +29,9 @@ const Signup = () => {
   };
 
   return (
-    <div className="auth-container">
-      <form onSubmit={onSubmit} className="auth-form">
-        <h2>User Sign Up</h2>
+    <div className="hero flex justify-center items-center min-h-screen">
+      <form onSubmit={onSubmit}  className="card p-7 shadow-lg w-full max-w-md shadow-[#303c58] text-center bg-white/10 border border-white/20 backdrop-blur-md flex items-center ">
+        <h2 className="text-4xl py-4">User Sign Up</h2>
         <input
           type="text"
           name="name"
@@ -39,6 +39,7 @@ const Signup = () => {
           value={form.name}
           onChange={handleChange}
           required
+          className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="email"
@@ -47,6 +48,7 @@ const Signup = () => {
           value={form.email}
           onChange={handleChange}
           required
+          className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="password"
@@ -55,6 +57,7 @@ const Signup = () => {
           value={form.password}
           onChange={handleChange}
           required
+          className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="tel"
@@ -62,13 +65,15 @@ const Signup = () => {
           placeholder="Phone (optional)"
           value={form.phone}
           onChange={handleChange}
+          className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
-        <button type="submit" disabled={loading}>
+        
+        <button className="bg-white/20 w-20 h-10 cursor-pointer rounded-xl hover:border border-white  " type="submit" disabled={loading}>
           {loading ? 'Signing up...' : 'Sign Up'}
         </button>
         {error && <div className="error-msg">{error}</div>}
-        <p>
-          Already have an account? <a href="/user-login">Login</a>
+        <p className="pt-4">
+          Already have an account? <a className="  cursor-pointer rounded-xl hover:text-[#636363]  " href="/user-login">Login</a>
         </p>
       </form>
     </div>

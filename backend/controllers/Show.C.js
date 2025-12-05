@@ -208,7 +208,7 @@ const getShowsByMovie = async (req, res) => {
     console.log("Fetching shows for movie:", movieId);
 
     const shows = await Show.findAll({
-      // where: { movie_id: movieId, status: 'is_active' },
+      where: { movie_id: movieId },
       order: [['start_time', 'ASC']],
     });
     console.log("Shows fetched:", shows);

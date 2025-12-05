@@ -57,13 +57,14 @@ const Thater_signup = () => {
   };
 
   return (
-    <div className="auth-container">
+    <div className="hero flex justify-center items-baseline min-h-screen  ">
       <form
         onSubmit={onSubmit}
-        className="auth-form"
+        className="card p-7 shadow-lg w-full max-w-md shadow-[#303c58] text-center bg-white/10 border border-white/20 backdrop-blur-md flex items-center "
         encType="multipart/form-data"
       >
-        <h2>Theater Sign Up</h2>
+        <h2 className="text-4xl py-4">Theater Sign Up</h2>
+      <div></div>
         <input
           type="text"
           name="name"
@@ -71,6 +72,7 @@ const Thater_signup = () => {
           value={form.name}
           onChange={handleChange}
           required
+           className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="email"
@@ -79,6 +81,7 @@ const Thater_signup = () => {
           value={form.email}
           onChange={handleChange}
           required
+           className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="password"
@@ -87,6 +90,7 @@ const Thater_signup = () => {
           value={form.password}
           onChange={handleChange}
           required
+           className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="tel"
@@ -95,6 +99,7 @@ const Thater_signup = () => {
           value={form.contact_number}
           onChange={handleChange}
           required
+           className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="text"
@@ -102,6 +107,7 @@ const Thater_signup = () => {
           placeholder="Address"
           value={form.address}
           onChange={handleChange}
+           className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="text"
@@ -110,6 +116,7 @@ const Thater_signup = () => {
           value={form.city}
           onChange={handleChange}
           required
+           className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="text"
@@ -117,6 +124,7 @@ const Thater_signup = () => {
           placeholder="State"
           value={form.state}
           onChange={handleChange}
+           className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="text"
@@ -124,6 +132,7 @@ const Thater_signup = () => {
           placeholder="Pincode"
           value={form.pincode}
           onChange={handleChange}
+           className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="number"
@@ -131,6 +140,7 @@ const Thater_signup = () => {
           placeholder="Total Screens"
           value={form.total_screens}
           onChange={handleChange}
+           className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="number"
@@ -138,19 +148,21 @@ const Thater_signup = () => {
           placeholder="Total Seats"
           value={form.total_seats}
           onChange={handleChange}
+           className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
         <input
           type="file"
           multiple
           onChange={handleImages}
           accept="image/*"
+           className="border border-white/20 placeholder-white/70 bg-white/10 mb-4 p-2 rounded-md w-full text-white"
         />
-        <button type="submit" disabled={loading}>
+        <button className="bg-white/20 w-20 h-10 cursor-pointer rounded-xl hover:border border-white  " type="submit" disabled={loading}>
           {loading ? "Signing up..." : "Sign Up"}
         </button>
         {error && <div className="error-msg">{error}</div>}
-        <p>
-          Already have an account? <a href="/thater-login">Login</a>
+        <p  className="pt-4">
+          Already have an account? <a className="  cursor-pointer rounded-xl hover:text-[#636363]  " href="/thater-signup" >Login</a>
         </p>
       </form>
     </div>
