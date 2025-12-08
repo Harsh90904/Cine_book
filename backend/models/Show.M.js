@@ -1,11 +1,12 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, DATE } = require('sequelize');
 const sequelize = require('../config/DB');
 
 const Show = sequelize.define('Show', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
-    primaryKey: true
+    primaryKey: true,
+    allowNull:false
   },
   thater_id: {
     type: DataTypes.UUID,
@@ -20,10 +21,10 @@ const Show = sequelize.define('Show', {
     allowNull: false
   },
   start_time: {
-    type: DataTypes.DATE,
+    type: DataTypes.TIME,
     allowNull: false
   },
-  end_time: {
+  Date: {
     type: DataTypes.DATE,
     allowNull: false
   },

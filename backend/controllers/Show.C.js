@@ -63,7 +63,7 @@ const sequelize = require('../config/DB');
 // };
 const addShow = async (req, res) => {
   try {
-    const { thater_id, screen_id, movie_id, start_time, end_time, ticket_price, status } = req.body;
+    const { thater_id, screen_id, movie_id, start_time, Date,language, ticket_price, status } = req.body;
 
     if (!screen_id || !movie_id || !start_time || !ticket_price) {
       return res.status(400).json({ message: "screen_id, movie_id, start_time & ticket_price required" });
@@ -74,9 +74,10 @@ const addShow = async (req, res) => {
       movie_id,
       thater_id,
       start_time,
-      end_time: end_time || null,
+      Date,
       ticket_price,
       status: status || "active",
+      language
     });
 
     // const showDetails = await Show.findByPk(show.id, {
@@ -209,6 +210,11 @@ const getShowsByMovie = async (req, res) => {
 
     const shows = await Show.findAll({
       where: { movie_id: movieId },
+      
+      include: [
+    { model: Theater, attributes: ["id", "name", "city", "state"] },
+    { model: Screen, attributes: ["id", "type"] }
+  ],
       order: [['start_time', 'ASC']],
     });
     console.log("Shows fetched:", shows);

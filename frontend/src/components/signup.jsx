@@ -17,8 +17,7 @@ const Signup = () => {
     setLoading(true);
     try {
       const res = await API.post('/user/signup', form);
-      localStorage.setItem('user_token', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
+      cookieStore.set("user",res.data.token);
       nav('/');
     } catch (err) {
       const msg = err?.response?.data?.message || err.message;

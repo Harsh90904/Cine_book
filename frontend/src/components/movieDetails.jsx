@@ -5,6 +5,7 @@ import "../styles/movieDetails.css";
 
 const MovieDetails = () => {
   const { movieId } = useParams();
+  const { thaterid} = useParams()
   const nav = useNavigate();
   const [movie, setMovie] = useState(null);
   const [shows, setShows] = useState([]);
@@ -28,6 +29,7 @@ const MovieDetails = () => {
       
       // fetch shows after movie is loaded
       await fetchShowsByMovie();
+      await fratchShowaByThater();
     } catch (err) {
       console.error("Fetch Movie Error:", err);
       setError(err?.response?.data?.message || "Failed to load movie details");
@@ -35,7 +37,25 @@ const MovieDetails = () => {
       setLoading(false);
     }
   };
-
+  const fratchShowaByThater = async () => {
+    try {
+      console.log("Fetching shows from: /show/movie/${movieId}");
+      const res = await API.get(`/show//thater/${thaterid}`);
+      console.log("Shows response:", res.data);
+      
+      if (Array.isArray(res.data)) {
+        setShows(res.data);
+        console.log("Show ", res.data)
+      } else if (res.data.shows) {
+        setShows(res.data.shows);
+      } else {
+        setShows([]);
+      }
+    } catch (err) {
+      console.error("Failed to fetch shows:", err?.response?.status, err?.response?.data);
+      // Don't set error here — shows section can be empty
+    }
+  }
   const fetchShowsByMovie = async () => {
     try {
       console.log("Fetching shows from: /show/movie/${movieId}");
@@ -44,6 +64,7 @@ const MovieDetails = () => {
       
       if (Array.isArray(res.data)) {
         setShows(res.data);
+        console.log("Show ", res.data)
       } else if (res.data.shows) {
         setShows(res.data.shows);
       } else {
@@ -165,7 +186,7 @@ const MovieDetails = () => {
         <h2>Select Theater & Show Time</h2>
 
         {shows.length === 0 ? (
-          <div className="no-shows">
+          <div className="no-shows text-black">
             <p>🎬 No shows available for this movie at the moment</p>
             <button onClick={handleGoBack} className="btn-primary">
               Browse Other Movies
@@ -173,7 +194,7 @@ const MovieDetails = () => {
           </div>
         ) : (
           <div className="theaters-list">
-            {Object.entries(showsByTheater).map(([theaterId, { theater, shows: theaterShows }]) => (
+            {Object.entries(showsByTheater).map(([theaterId, { theater, shows: theaterShows },]) => (
               <div key={theaterId} className="theater-block">
                 <h3 className="theater-name">
                   🎭 {theater?.name || "Theater"}

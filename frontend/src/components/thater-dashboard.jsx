@@ -58,7 +58,7 @@ const ThaterDashboard = () => {
       const [thaterRes, screensRes, showsRes] = await Promise.all([
         API.get(`/thater/${thaterId}`),
         API.get(`/screen/thater/${thaterId}`),
-         API.get(`/show/thater/${thaterId}`),
+        API.get(`/show/thater/${thaterId}`),
       ]);
 
       setthater(thaterRes.data);
@@ -153,15 +153,24 @@ const ThaterDashboard = () => {
   const handleAddShow = async (e) => {
     e.preventDefault();
     try {
-      if (!showForm.screen_id || !showForm.movie_id || !showForm.start_time || !showForm.ticket_price) {
+      if (
+        !showForm.screen_id ||
+        !showForm.movie_id ||
+        !showForm.start_time ||
+        !showForm.ticket_price
+      ) {
         alert("Please fill all required fields");
         return;
       }
 
       const token = localStorage.getItem("thater_token");
       const payload = {
-        ...showForm,
-        thater_id: user.id,
+        screen_id: showForm.screen_id,
+        movie_id: showForm.movie_id,
+        start_time: showForm.start_time,
+        end_time: showForm.end_time,
+        ticket_price: showForm.ticket_price,
+        status: showForm.status,
       };
 
       if (editingShow) {
@@ -236,8 +245,10 @@ const ThaterDashboard = () => {
   };
 
   // currently selected movie for preview in modal
-  const selectedMovie = movies.find((m) => String(m.id) === String(showForm.movie_id));
-  
+  const selectedMovie = movies.find(
+    (m) => String(m.id) === String(showForm.movie_id)
+  );
+
   if (loading) {
     return <div className="loading">Loading dashboard...</div>;
   }
@@ -378,7 +389,9 @@ const ThaterDashboard = () => {
                       </p>
                       <p>
                         <strong>Status:</strong>
-                        <span className={screen.is_active ? "active" : "inactive"}>
+                        <span
+                          className={screen.is_active ? "active" : "inactive"}
+                        >
                           {screen.is_active ? "Active" : "Inactive"}
                         </span>
                       </p>
@@ -525,32 +538,49 @@ const ThaterDashboard = () => {
                   </thead>
                   <tbody>
                     {shows.map((show) => {
-                      const movieFromList = movies.find((m) => String(m.id) === String(show.movie_id));
+                      const movieFromList = movies.find(
+                        (m) => String(m.id) === String(show.movie_id)
+                      );
                       const moviePoster =
                         show.movie?.poster_url ||
                         movieFromList?.poster_url ||
                         movieFromList?.poster ||
                         "/placeholder-movie.png";
                       const movieTitle =
-                        show.movie?.title ||
-                        movieFromList?.title ||
-                        "N/A";
+                        show.movie?.title || movieFromList?.title || "N/A";
                       return (
                         <tr key={show.id}>
                           <td>
-                            <div className="movie-cell" style={{display:'flex',alignItems:'center',gap:8}}>
+                            <div
+                              className="movie-cell"
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
                               <img
                                 src={moviePoster}
                                 alt={movieTitle}
-                                style={{width:48,height:68,objectFit:'cover',borderRadius:4}}
-                                onError={(e)=> (e.currentTarget.src='/placeholder-movie.png')}
+                                style={{
+                                  width: 48,
+                                  height: 68,
+                                  objectFit: "cover",
+                                  borderRadius: 4,
+                                }}
+                                onError={(e) =>
+                                  (e.currentTarget.src =
+                                    "/placeholder-movie.png")
+                                }
                               />
                               <div>{movieTitle}</div>
                             </div>
                           </td>
                           <td>
                             {show.screen?.name ||
-                              screens.find((s) => String(s.id) === String(show.screen_id))?.name ||
+                              screens.find(
+                                (s) => String(s.id) === String(show.screen_id)
+                              )?.name ||
                               "N/A"}
                           </td>
                           <td>{new Date(show.start_time).toLocaleString()}</td>
@@ -634,16 +664,37 @@ const ThaterDashboard = () => {
 
                     {/* movie preview */}
                     {selectedMovie && (
-                      <div className="movie-preview" style={{display:'flex',alignItems:'center',gap:12,marginBottom:12}}>
+                      <div
+                        className="movie-preview"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          marginBottom: 12,
+                        }}
+                      >
                         <img
-                          src={selectedMovie.poster_url || selectedMovie.poster || '/placeholder-movie.png'}
+                          src={
+                            selectedMovie.poster_url ||
+                            selectedMovie.poster ||
+                            "/placeholder-movie.png"
+                          }
                           alt={selectedMovie.title}
-                          style={{width:80,height:120,objectFit:'cover',borderRadius:6}}
-                          onError={(e)=> (e.currentTarget.src='/placeholder-movie.png')}
+                          style={{
+                            width: 80,
+                            height: 120,
+                            objectFit: "cover",
+                            borderRadius: 6,
+                          }}
+                          onError={(e) =>
+                            (e.currentTarget.src = "/placeholder-movie.png")
+                          }
                         />
                         <div>
                           <strong>{selectedMovie.title}</strong>
-                          <div style={{fontSize:12,color:'#666'}}>{selectedMovie.genre || selectedMovie.category}</div>
+                          <div style={{ fontSize: 12, color: "#666" }}>
+                            {selectedMovie.genre || selectedMovie.category}
+                          </div>
                         </div>
                       </div>
                     )}

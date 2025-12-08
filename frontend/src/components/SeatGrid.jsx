@@ -3,6 +3,7 @@ import React from "react";
 import Seat from "./Seat";
 import PropTypes from "prop-types";
 
+// eslint-disable-next-line react/prop-types
 function SeatGrid({ seats, selected, toggle }) {
   const rows = {};
 
@@ -36,6 +37,7 @@ function SeatGrid({ seats, selected, toggle }) {
         <div key={rowKey} style={{ display: "flex", alignItems: "center", marginBottom: 6 }}>
           <div style={{ width: 20, marginRight: 10, fontWeight: "bold" }}>{rowKey}</div>
           {rows[rowKey].map((s) => (
+            // eslint-disable-next-line react/prop-types
             <Seat key={s.id} seat={s} isSelected={selected.includes(s.id)} onClick={toggle} />
           ))}
         </div>
@@ -66,15 +68,14 @@ function SeatGrid({ seats, selected, toggle }) {
 
 SeatGrid.propTypes = {
   seats: PropTypes.arrayOf(
+    PropTypes.array.isRequired,
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       row: PropTypes.string.isRequired,
       status: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
     })
-  ).isRequired,
-  selected: PropTypes.array.isRequired,
-  toggle: PropTypes.func.isRequired,
+  )
 };
 
 export default SeatGrid;

@@ -5,6 +5,9 @@ import Home from "./components/Home";
 // import Booking from "./components/Booking.jsx";
 // import SeatSelection from "./components/SeatSelection";
 import MovieDetails from "./components/movieDetails";
+import SeatSelection from "./components/SeatSelection"
+import SeatGrid from "./components/SeatGrid"
+import Seat from "./components/Seat"
 import Login from "./components/login";
 import Signup from "./components/signup";
 import Thater_Login from "./components/Thater_Login";
@@ -21,6 +24,9 @@ export default function App() {
           <Route path="/movie/:movieId" element={<MovieDetails />} />
           {/* <Route path="/booking/:showId" element={<Booking />} /> */}
           {/* <Route path="/show/:show_id" element={<SeatSelection />} /> */}
+          <Route path="/SeatSelection" element={<SeatSelection />} />
+          <Route path="/Seat" element={<Seat />} />
+          <Route path="/SeatGrid" element={<SeatGrid />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/thater_login" element={<Thater_Login />} />

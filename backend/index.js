@@ -8,10 +8,10 @@ const BookingRouter = require("./routers/booking.R");
 const SeatRouter = require("./routers/seat.R");
 const ScreenRouter = require("./routers/screen.R");
 const ShowRouter = require("./routers/Show.R");
-const assignAssociations = require("./models");
+const {assignAssociations} = require("./models/index");
 const path = require("path");
 require("dotenv").config();
-//assignAssociations();
+assignAssociations();
 
 const app = express();
 app.use(cors());

@@ -30,6 +30,7 @@
     "pg-hstore": "^2.3.4",
     "razorpay": "^2.9.6",
     "sequelize": "^6.37.7",
+    "socket.io": "^4.8.1",
     "stripe": "^18.5.0",
     "twilio": "^5.10.0",
     "uuid": "^13.0.0"

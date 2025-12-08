@@ -17,8 +17,7 @@ const Login = () => {
     setLoading(true);
     try {
       const res = await API.post('/user/login', form);
-      localStorage.setItem('user', res.data.token);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
+      cookieStore.set("user",res.data.token)
       nav('/');
     } catch (err) {
       const msg = err?.response?.data?.message || err.message;

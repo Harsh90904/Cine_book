@@ -2,7 +2,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-export default function Seat({ seat, isSelected, onClick }) {
+function Seat({ seat, isSelected, onClick }) {
   const getColor = () => {
     if (seat.status === "booked") return "#e62e2e"; // Red for booked
     if (seat.status === "reserved") return "#f4c430"; // Yellow for reserved
@@ -43,3 +43,5 @@ Seat.propTypes = {
   isSelected: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
 };
+
+export default Seat
