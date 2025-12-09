@@ -1,4 +1,5 @@
-module.exports = (sequelize, DataTypes) => {
+const sequelize = require("../config/DB");
+const { DataTypes } = require('sequelize');
   const BookingSeat = sequelize.define('BookingSeat', {
     id: {
       type: DataTypes.INTEGER,
@@ -6,12 +7,10 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       allowNull: false,
     },
-  });
+  },{
+  tableName: 'bookingSeat',
+  timestamps: true,
+  underscored: true
+});
 
-  BookingSeat.associate = (models) => {
-    BookingSeat.belongsTo(models.Booking, { foreignKey: 'booking_id', onDelete: 'CASCADE' });
-    BookingSeat.belongsTo(models.ShowSeat, { foreignKey: 'show_seat_id', onDelete: 'CASCADE' });
-  };
-
-  return BookingSeat;
-};
+module.exports = BookingSeat

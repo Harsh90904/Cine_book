@@ -3,96 +3,76 @@ const sequelize = require('../config/DB');
   const Screen = require('../models/Screen.M');
   const Movie = require('../models/movie.M');
   const ShowSeat = require('../models/ShowSeat.M');
+  // const Thater = require("../models/Thater.M");
+const Theater = require('../models/Thater.M');
 
-// const addShow = async (req, res) => {
+const addShow = async (req, res) => {
   
 
-//   const t = await sequelize.transaction();
-//   try {
-//     const { thater_id, screen_id, movie_id, start_time, end_time, ticket_price, status } = req.body;
-//     if (!screen_id || !movie_id || !start_time || ticket_price === undefined) {
-//       await t.rollback();
-//       return res.status(400).json({ message: "screen_id, movie_id, start_time and ticket_price are required" });
-//     }
-//     console.log("Creating show with:", req.body);
-//     const screen = await Screen.findByPk(screen_id, { transaction: t });
-//     if (!screen) {
-//       await t.rollback();
-//       return res.status(404).json({ message: "Screen not found" });
-//     }
-//     console.log("Found screen:", screen.toJSON());
-//     const movie = await Movie.findByPk(movie_id, { transaction: t });
-//     if (!movie) {
-//       await t.rollback();
-//       return res.status(404).json({ message: "Movie not found" });
-//     }
-//     console.log("Found movie:", movie.toJSON());
-//     const show = await Show.create({
-//       screen_id,
-//       movie_id,
-//       thater_id: thater_id || screen.thater_id,
-//       start_time: new Date(start_time),
-//       end_time: end_time ? new Date(end_time) : null,
-//       ticket_price: parseInt(ticket_price, 10),
-//       status: status || "active",
-//     }, { transaction: t });
-//     console.log("Created show:", show.toJSON());
-//     // create seats for show
-//     // const seats = [];
-//     // const seatCount = parseInt(screen.seat_count, 10) || 0;
-//     // for (let i = 1; i <= seatCount; i++) {
-//     //   seats.push({ show_id: show.id, seat_number: i, is_available: true });
-//     // }
-//     // if (seats.length){ await ShowSeat.bulkCreate(seats, { transaction: t });}
-//     // console.log(`Created ${seats.length} seats for show ${show.id}`);
-//     // await t.commit();
-
-//     const showWithDetails = await Show.findByPk(show.id, {
-//       include: [
-//         {   attributes: ['id', 'name', 'seat_count', 'type'] },
-//         { model: Movie, as: 'movie', attributes: ['id', 'title', 'duration', 'genre'] },
-//       ],
-//     });
-//     console.log("Returning show with details:", showWithDetails.toJSON());
-//     return res.status(201).json({ message: "Show created", show: showWithDetails });
-//   } catch (error) {
-//     console.error("Add Show Error:", error);
-//     try { await t.rollback(); } catch (e) { /* ignore */ }
-//     return res.status(500).json({ message: error.message || "Internal Server Error" });
-//   }
-// };
-const addShow = async (req, res) => {
+  const t = await sequelize.transaction();
   try {
-    const { thater_id, screen_id, movie_id, start_time, Date,language, ticket_price, status } = req.body;
-
-    if (!screen_id || !movie_id || !start_time || !ticket_price) {
-      return res.status(400).json({ message: "screen_id, movie_id, start_time & ticket_price required" });
+    const { thater_id, screen_id, movie_id, start_time, Date, ticket_price, status,language } = req.body;
+    if (!screen_id || !movie_id || !start_time || ticket_price === undefined) {
+      await t.rollback();
+      return res.status(400).json({ message: "screen_id, movie_id, start_time and ticket_price are required" });
     }
-
+    console.log("Creating show with:", req.body);
+    const screen = await Screen.findByPk(screen_id, { transaction: t });
+    if (!screen) {
+      await t.rollback();
+      return res.status(404).json({ message: "Screen not found" });
+    }
+    console.log("Found screen:", screen.toJSON());
+    const movie = await Movie.findByPk(movie_id);
+    if (!movie) {
+      await t.rollback();
+      return res.status(404).json({ message: "Movie not found" });
+    }
+    console.log("Found movie:", movie.toJSON());
     const show = await Show.create({
       screen_id,
       movie_id,
-      thater_id,
+      thater_id: thater_id || screen.thater_id,
       start_time,
       Date,
-      ticket_price,
+      language,
+      ticket_price: parseInt(ticket_price, 10),
       status: status || "active",
-      language
-    });
-
-    // const showDetails = await Show.findByPk(show.id, {
-    //   include: [
-    //     { model: Screen, as: "screen" },
-    //     { model: Movie, as: "movie" }
-    //   ]
-    // });
-
-    res.status(201).json({ message: "Show created", show });
+    }, { transaction: t });
+    console.log("Created show:", show.toJSON());
+    return res.status(201).json({ message: "Show created", show });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message || "Internal Server Error" });
+    console.error("Add Show Error:", error);
+    try { await t.rollback(); } catch (e) { /* ignore */ }
+    return res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };
+// const addShow = async (req, res) => {
+//   try {
+//     const { thater_id, screen_id, movie_id, start_time, Date,language, ticket_price, status } = req.body;
+
+//     if (!screen_id || !movie_id || !start_time || !ticket_price) {
+//       return res.status(400).json({ message: "screen_id, movie_id, start_time & ticket_price required" });
+//     }
+
+//     const show = await Show.create({
+//       screen_id,
+//       movie_id,
+//       thater_id,
+//       start_time,
+//       Date,
+//       ticket_price,
+//       status: status || "active",
+//       language
+//     });
+
+
+//     res.status(201).json({ message: "Show created", show });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: error.message || "Internal Server Error" });
+//   }
+// };
 const getShowsByTheater = async (req, res) => {
 
   try {
@@ -133,14 +113,14 @@ const updateShow = async (req, res) => {
     if (!show) return res.status(404).json({ message: "Show not found" });
 
     // optional: validate new screen/movie exist
-    if (screen_id) {
-      const screen = await Screen.findByPk(screen_id);
-      if (!screen) return res.status(404).json({ message: "New screen not found" });
-    }
-    if (movie_id) {
-      const movie = await Movie.findByPk(movie_id);
-      if (!movie) return res.status(404).json({ message: "New movie not found" });
-    }
+    // if (screen_id) {
+    //   const screen = await Screen.findByPk(screen_id);
+    //   if (!screen) return res.status(404).json({ message: "New screen not found" });
+    // }
+    // if (movie_id) {
+    //   const movie = await Movie.findByPk(movie_id);
+    //   if (!movie) return res.status(404).json({ message: "New movie not found" });
+    // }
 
     await show.update({
       screen_id: screen_id || show.screen_id,
@@ -152,10 +132,6 @@ const updateShow = async (req, res) => {
     });
 
     const updated = await Show.findByPk(id, {
-      include: [
-        { model: Screen, as: 'screen', attributes: ['id', 'name', 'seat_count'] },
-        { model: Movie, as: 'movie', attributes: ['id', 'title'] },
-      ],
     });
 
     return res.status(200).json({ message: "Show updated", show: updated });
@@ -200,9 +176,6 @@ const getShowSeats = async (req, res) => {
   }
 };
 const getShowsByMovie = async (req, res) => {
-  const Show = require('../models/Show.M');
-  const Screen = require('../models/Screen.M');
-  const Theater = require('../models/Thater.M');
 
   try {
     const { movieId } = req.params;
@@ -210,11 +183,12 @@ const getShowsByMovie = async (req, res) => {
 
     const shows = await Show.findAll({
       where: { movie_id: movieId },
-      
-      include: [
-    { model: Theater, attributes: ["id", "name", "city", "state"] },
-    { model: Screen, attributes: ["id", "type"] }
-  ],
+  //     as:Theater,
+  //     as:Screen,
+  //     include: [
+  //   { model: Theater, attributes: ["id", "name", "city", "state"] },
+  //   { model: Screen, attributes: ["id", "type"] }
+  // ],
       order: [['start_time', 'ASC']],
     });
     console.log("Shows fetched:", shows);

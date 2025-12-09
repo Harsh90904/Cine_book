@@ -12,6 +12,7 @@ const Movie = sequelize.define('Movie', {
     allowNull: false,
     unique: true
   },
+  // show_id: { type: DataTypes.UUID, allowNull: false },
   genre: DataTypes.STRING,
   duration: DataTypes.INTEGER,
   language: DataTypes.STRING,

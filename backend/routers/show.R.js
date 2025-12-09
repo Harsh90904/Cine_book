@@ -10,7 +10,6 @@ const {
   getShowsByMovie
 } = require('../controllers/Show.C');
 const ThaterDecodeJWT = require('../middlewares/decodejwt');
-const Show = require('../models/Show.M');
 
 ShowRouter.post('/', addShow);
 ShowRouter.get('/thater/:id', getShowsByTheater);
