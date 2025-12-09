@@ -4,11 +4,12 @@ import API from "../config/api";
 import "../styles/movieDetails.css";
 
 const MovieDetails = () => {
+  const [shows, setShows] = useState([]);
   const { movieId } = useParams();
   const { thaterid} = useParams()
   const nav = useNavigate();
   const [movie, setMovie] = useState(null);
-  const [shows, setShows] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -23,6 +24,7 @@ const MovieDetails = () => {
       setError("");
       
       console.log("Fetching movie from: /movie/${movieId}");
+      
       const res = await API.get(`/movie/${movieId}`);
       console.log("Movie data:", res.data);
       setMovie(res.data);
@@ -39,8 +41,8 @@ const MovieDetails = () => {
   };
   const fratchShowaByThater = async () => {
     try {
-      console.log("Fetching shows from: /show/movie/${movieId}");
-      const res = await API.get(`/show//thater/${thaterid}`);
+      console.log("Fetching shows from: theater id",thaterid);
+      const res = await API.get(`/show/thater/${thaterid}`);
       console.log("Shows response:", res.data);
       
       if (Array.isArray(res.data)) {

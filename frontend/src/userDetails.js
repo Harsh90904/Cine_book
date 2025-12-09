@@ -15,3 +15,18 @@ export const getUserDetails = () => {
     return null;
   }
 };
+
+export const getThaterDetails = () => {
+  try {
+    localStorage.getItem("Thater")
+    const token = Cookies.get("Thater");
+    if (!token) return null;
+
+    const decoded = jwtDecode(token);
+
+    return decoded; 
+  } catch (error) {
+    console.error("Invalid Token:", error);
+    return null;
+  }
+};

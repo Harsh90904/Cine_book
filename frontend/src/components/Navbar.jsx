@@ -56,7 +56,7 @@ const Navbar = () => {
       </li>
 
       {/* Theater Login/Signup */}
-      {!user || user.role !== "USER" ? (
+      {!user || user.role !== "USER" ?   (
         <>
           <li>
             <Link className="hover:bg-white hover:text-purple-900 rounded-lg" to="/thater_login">
@@ -69,7 +69,7 @@ const Navbar = () => {
             </Link>
           </li>
         </>
-      ) : null}
+      ) : null  }
 
       {/* Admin link */}
       {Ability(["admin"]) && (

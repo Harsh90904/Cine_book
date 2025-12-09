@@ -18,8 +18,8 @@ const Thater_Login = () => {
     setLoading(true);
     try {
       const res = await API.post("/thater/login", form);
-      localStorage.setItem("thater_token", res.data.token);
-      localStorage.setItem("thater_user", JSON.stringify(res.data.user));
+      cookieStore.set("thater_token",res.data.token);
+      cookieStore.set("thater_user",JSON.stringify(res.data.user));
       nav("/thater-dashboard");
     } catch (err) {
       const msg = err?.response?.data?.message || err.message;

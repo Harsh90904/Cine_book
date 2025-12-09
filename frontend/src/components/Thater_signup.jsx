@@ -45,8 +45,8 @@ const Thater_signup = () => {
       const res = await API.post("/Thater", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      localStorage.setItem("thater_token", res.data.token);
-      localStorage.setItem("thater_user", JSON.stringify(res.data.user));
+      cookieStore.set("thater_token",res.data.token);
+      cookieStore.set("thater_user",JSON.stringify(res.data.user));
       nav("/thater-dashboard.jsx");
     } catch (err) {
       const msg = err?.response?.data?.message || err.message;

@@ -16,19 +16,19 @@ const addShow = async (req, res) => {
       await t.rollback();
       return res.status(400).json({ message: "screen_id, movie_id, start_time and ticket_price are required" });
     }
-    console.log("Creating show with:", req.body);
+  
     const screen = await Screen.findByPk(screen_id, { transaction: t });
     if (!screen) {
       await t.rollback();
       return res.status(404).json({ message: "Screen not found" });
     }
-    console.log("Found screen:", screen.toJSON());
+   
     const movie = await Movie.findByPk(movie_id);
     if (!movie) {
       await t.rollback();
       return res.status(404).json({ message: "Movie not found" });
     }
-    console.log("Found movie:", movie.toJSON());
+   
     const show = await Show.create({
       screen_id,
       movie_id,
@@ -39,7 +39,7 @@ const addShow = async (req, res) => {
       ticket_price: parseInt(ticket_price, 10),
       status: status || "active",
     }, { transaction: t });
-    console.log("Created show:", show.toJSON());
+    await t.commit();
     return res.status(201).json({ message: "Show created", show });
   } catch (error) {
     console.error("Add Show Error:", error);
